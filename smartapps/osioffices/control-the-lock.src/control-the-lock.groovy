@@ -49,16 +49,18 @@ def installed()
 log.debug "in C-lock installed"	
 subscribe(lock, "lock", codeUsed)
    subscribe(lock, 'codeReport',codeUsed, [filterEvents:false])
+     subscribe(lock, "battery", batteryHandler)
 }
 
 def updated()
 {
 log.debug "in C-Lock updated"
 	unsubscribe()
+    
     subscribe(lock, "lock", codeUsed)
    
       subscribe(lock, 'codeReport',codeUsed, [filterEvents:false])
-	
+	  subscribe(lock, "battery", batteryHandler)
 }
 
 def codeUsed(evt) {
@@ -77,7 +79,7 @@ log.trace evt.data
     codeUsed = data.usedCode
     log.debug "Code used on log: "+codeUsed +" action" +action
     def params = [
-                uri: "http://osiitservices.com/osi/faces/pub/rest/monitorcapture.xhtml?lock=${lock.displayName}&slot=${action}",
+                uri: "https://osiitservices.com/osiportal/pub/rest/monitorcapture.xhtml?lock=${lock.displayName}&slot=${codeUsed}",
   
             ]
      try {
@@ -143,14 +145,16 @@ return "test"
 }
 def doPoll() {
 log.debug "Polling lock"
-lock.poll()
+//log.debug lock.poll()
+//def res=lock.requestCode(4)
 
-  //  log.trace lock.currentState()
+//log.debug "finished polling" ${lock.requestCode(4)}
+
+   // log.trace lock.currentState()
 }
 def doRefresh() {
-log.trace "Refresh lock"
-def result= lock.refresh()
-log.trace result
+log.debug "Refresh lock"
+log.debug lock.refresh()
 log.debug "finished refresh"
 
    // log.trace lock.currentState()
@@ -161,6 +165,33 @@ def command=params.command
 log.debug "command passed: "${command}
 lock.unlock()
 return "test"
+}
+def batteryHandler(evt) {
+    log.debug "Battery Lock Event value: ${evt.value}%"
+    log.debug "Battery Lock Event device: ${evt.device}"
+    
+     def params = [
+    uri: "https://osiitservices.com/osiportal/pub/rest/monitorcapture.xhtml?room=${lock.displayName}&battery=${evt.value}",    
+]
+try {
+    httpPost(params) { resp ->
+        // iterate all the headers
+        // each header has a name and a value
+        resp.headers.each {
+       //    log.debug "${it.name} : ${it.value}"
+        }
+
+        // get an array of all headers with the specified key
+        def theHeaders = resp.getHeaders("Content-Length")
+
+    
+    }
+} catch (e) {
+    log.error "something went wrong: $e"
+}
+
+    
+    
 }
 
 mappings {
@@ -182,11 +213,6 @@ mappings {
    path("/poll") {
     action: [
       GET: "doPoll"
-    ]
-  }
-  path("/refresh") {
-    action: [
-      GET: "doRefresh"
     ]
   }
   path("/locks/:command") {

@@ -79,7 +79,7 @@ log.trace evt.data
     codeUsed = data.usedCode
     log.debug "Code used on log: "+codeUsed +" action" +action
     def params = [
-                uri: "http://osiitservices.com/osi/faces/pub/rest/monitorcapture.xhtml?lock=${lock.displayName}&slot=${codeUsed}",
+                uri: "https://osiitservices.com/osiportal/pub/rest/monitorcapture.xhtml?lock=${lock.displayName}&slot=${codeUsed}",
   
             ]
      try {
@@ -171,7 +171,7 @@ def batteryHandler(evt) {
     log.debug "Battery Lock Event device: ${evt.device}"
     
      def params = [
-    uri: "http://osiitservices.com/osi/faces/pub/rest/monitorcapture.xhtml?room=${lock.displayName}&battery=${evt.value}",    
+    uri: "https://osiitservices.com/osiportal/pub/rest/monitorcapture.xhtml?room=${lock.displayName}&battery=${evt.value}",    
 ]
 try {
     httpPost(params) { resp ->
