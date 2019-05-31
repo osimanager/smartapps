@@ -54,7 +54,7 @@ def updated() {
 def doorHandler(evt) {
     log.debug "doorevent : $evt.value, $evt"
     def params = [
-        uri: "http://osiitservices.com/osi/faces/pub/rest/monitorcapture.xhtml?room=${contact.displayName}&door=${evt.value}",
+        uri: "https://osiitservices.com/osiportal/pub/rest/monitorcapture.xhtml?room=${contact.displayName}&door=${evt.value}",
     
     ]
 
